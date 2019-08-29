@@ -1,7 +1,7 @@
 ## Basic Usage
 
 ```js
-let swatcher = new Swatcher.BuildSwatch({
+let swatcher = new Swatcher.BuildSwatcher({
 	container: 'swatches-container',
 	thirdparty_api: 'https://mediacdn.swatches.com',
 	selector_id: 'swatches-select',
@@ -9,14 +9,14 @@ let swatcher = new Swatcher.BuildSwatch({
 });
 ```
 
-## Build Source
+### Build Source
 
 ```
 npm run build
 
 ```
 
-## Run Test
+### Run Tests
 
 ```
 npm test
