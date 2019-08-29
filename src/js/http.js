@@ -23,4 +23,18 @@ module.exports = {
 				});
 		});
 	},
+	getProductMedia: (url, id) => {
+		return new Promise((resolve, reject) => {
+			const requestUrl = url + `/product/${id}`;
+			axios
+				.get(requestUrl)
+				.then(res => {
+					resolve({ variants: res.data.variations });
+				})
+				.catch(err => {
+					console.log(err);
+					reject(new Error('Failed to get product data from media image api'));
+				});
+		});
+	},
 };

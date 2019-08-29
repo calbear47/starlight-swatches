@@ -1,4 +1,5 @@
 import util from './util';
+import http from './http';
 import omit from 'lodash.omit';
 import '../scss/app.scss'; // Ensures that our scss is built and bundled on compilation.
 
@@ -6,7 +7,10 @@ function BuildSwatcher(options) {
 	const required_options = ['thirdparty_api', 'selector_id'];
 
 	this.current_url = '';
-	this.swatches = [];
+	this.product_id = '';
+	this.swatches_data = [];
+	this.swatches_media = [];
+	this.complete_swatches = [];
 
 	this._options = {
 		container: null,
@@ -27,6 +31,7 @@ function BuildSwatcher(options) {
 			// setup swatcher
 			this._options.container = options.container;
 			this._setupSwatcher(options);
+			this.compileData();
 		} else {
 			throw new Error(
 				`Build Swatcher was initialized without a required option.`,
@@ -42,6 +47,7 @@ function BuildSwatcher(options) {
 				// setup swatcher
 				this._options.container = foundElement;
 				this._setupSwatcher(options);
+				this.compileData();
 			} else {
 				throw new Error(
 					`Build Swatcher was initialized without a required option.`,
@@ -61,7 +67,26 @@ function BuildSwatcher(options) {
 	}
 }
 
-BuildSwatcher.prototype.buildSwatches = function() {};
+BuildSwatcher.prototype.compileData = function() {
+	http
+		.getProductData(this.current_url)
+		.then(res => {
+			this.product_id = res.id;
+			this.swatches_data = res.variants;
+			return http.getProductMedia(
+				this._options.thirdparty_api,
+				this.product_id,
+			);
+		})
+		.then(res => {
+			this.swatches_media = res.variants;
+		})
+		.catch(err => {
+			throw new Error(
+				`Failed to get data from eCommerce platform or Image api: ${err}`,
+			);
+		});
+};
 
 /** Helper Methods **/
 

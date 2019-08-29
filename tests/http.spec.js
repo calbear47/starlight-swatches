@@ -1,4 +1,5 @@
 import http from '../src/js/http';
+import axios from 'axios';
 
 describe('http', () => {
 	describe('getProductData', () => {
@@ -17,6 +18,22 @@ describe('http', () => {
 				'http://fakestarlight-knitting-society-627463.shoplightspeed.com/kahdakshdfk/cormo-worsted-elemental-affects.ajax';
 			await expect(http.getProductData(badUrl)).rejects.toThrow(
 				'Failed to get product data from ecommerce store',
+			);
+		});
+	});
+	describe('getProductMedia', () => {
+		test('makes a call to axios with correctly built url', async () => {
+			jest
+				.spyOn(axios, 'get')
+				.mockImplementation(() =>
+					Promise.resolve({ data: { variations: [] } }),
+				);
+
+			await expect(
+				http.getProductMedia('http://localhost:8000', '12345'),
+			).resolves.toEqual({ variants: [] });
+			expect(axios.get).toHaveBeenCalledWith(
+				'http://localhost:8000/product/12345',
 			);
 		});
 	});
