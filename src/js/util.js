@@ -3,7 +3,7 @@ import last from 'lodash.last';
 import trim from 'lodash.trim';
 import isPlainObject from 'lodash.isplainobject';
 
-module.exports = {
+let utilApi = {
 	convertUrlToAjax: url => {
 		return url.replace('.html', '.ajax');
 	},
@@ -22,6 +22,18 @@ module.exports = {
 	},
 	getCurrentUrl: () => {
 		return window.location.href;
+	},
+	getUrlQueryId: () => {
+		return utilApi.getParameterByName('id');
+	},
+	getParameterByName: (name, url) => {
+		if (!url) url = window.location.href;
+		name = name.replace(/[[\]]/g, '\\$&');
+		var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+			results = regex.exec(url);
+		if (!results) return null;
+		if (!results[2]) return '';
+		return decodeURIComponent(results[2].replace(/\+/g, ' '));
 	},
 	isElement: o => {
 		return typeof HTMLElement === 'object'
@@ -54,4 +66,13 @@ module.exports = {
 	isString: str => {
 		return typeof str === 'string';
 	},
+	mergeArraysBasedOnId: (a1, a2) => {
+		var hash = new Map();
+		a1.concat(a2).forEach(function(obj) {
+			hash.set(obj.id, Object.assign(hash.get(obj.id) || {}, obj));
+		});
+		return Array.from(hash.values());
+	},
 };
+
+module.exports = utilApi;

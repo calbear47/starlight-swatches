@@ -29,7 +29,13 @@ module.exports = {
 			axios
 				.get(requestUrl)
 				.then(res => {
-					resolve({ variants: res.data.variations });
+					resolve({
+						variants: res.data.variations.map(item => ({
+							id: item.product_id,
+							thumbnail: item.thumbnail_url,
+							fullsize: item.fullsize_url,
+						})),
+					});
 				})
 				.catch(() => {
 					reject(new Error('Failed to get product data from media image api'));

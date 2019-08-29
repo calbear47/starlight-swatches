@@ -69,6 +69,50 @@ describe('util', () => {
 		});
 	});
 
+	describe('getUrlQueryId', () => {
+		test('returns null when there is not a id query parameter', () => {
+			delete global.window.location;
+			const href = 'https://example.com/pathto/resource?q=asdf';
+			global.window.location = { href };
+
+			expect(util.getUrlQueryId()).toBeNull();
+		});
+
+		test('returns the id of the product in the url when it is present', () => {
+			delete global.window.location;
+			const href = 'https://example.com/pathto/resource?q=aasfasdf&id=12345678';
+			global.window.location = { href };
+
+			expect(util.getUrlQueryId()).toBe('12345678');
+		});
+	});
+
+	describe('getParameterByName', () => {
+		test('return null when query parameter cannot be found', () => {
+			delete global.window.location;
+			const href = 'https://example.com/pathto/resource?q=asdf';
+			global.window.location = { href };
+
+			expect(util.getParameterByName('search')).toBeNull();
+		});
+
+		test('return null when the url does not container any query parameters', () => {
+			delete global.window.location;
+			const href = 'https://example.com/pathto/resource';
+			global.window.location = { href };
+
+			expect(util.getParameterByName('search')).toBeNull();
+		});
+
+		test('return null when the url does not container any query parameters', () => {
+			delete global.window.location;
+			const href = 'https://example.com/pathto/resource?id=1234567';
+			global.window.location = { href };
+
+			expect(util.getParameterByName('id')).toBe('1234567');
+		});
+	});
+
 	/** isElement **/
 	describe('isElement', () => {
 		test('returns false when passing a string', () => {
@@ -132,6 +176,56 @@ describe('util', () => {
 
 		test('returns true when passed string', () => {
 			expect(util.isString('Hi!')).toBe(true);
+		});
+	});
+
+	/** mergeArraysBasedOnId **/
+	describe('mergeArraysBasedOnId', () => {
+		test('can merge two arrays of different lengths based on ids', () => {
+			const testArr1 = [
+				{
+					id: '1',
+					thumbnail: 'asdfasdf',
+				},
+				{
+					id: '2',
+					thumbnail: 'lkjhlkjh',
+				},
+			];
+
+			const testArr2 = [
+				{
+					id: '1',
+					name: 'Gold',
+				},
+				{
+					id: '2',
+					name: 'Blue',
+				},
+				{
+					id: '3',
+					name: 'Green',
+				},
+			];
+
+			const resultArr = [
+				{
+					id: '1',
+					name: 'Gold',
+					thumbnail: 'asdfasdf',
+				},
+				{
+					id: '2',
+					name: 'Blue',
+					thumbnail: 'lkjhlkjh',
+				},
+				{
+					id: '3',
+					name: 'Green',
+				},
+			];
+
+			expect(util.mergeArraysBasedOnId(testArr1, testArr2)).toEqual(resultArr);
 		});
 	});
 });

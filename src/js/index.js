@@ -1,16 +1,20 @@
 import util from './util';
 import http from './http';
+import swatch from './swatch';
 import omit from 'lodash.omit';
 import '../scss/app.scss'; // Ensures that our scss is built and bundled on compilation.
+import isNil from 'lodash.isnil';
 
 function BuildSwatcher(options) {
 	const required_options = ['thirdparty_api', 'selector_id'];
 
 	this.current_url = '';
 	this.product_id = '';
+	this.selectorElement = null;
 	this.swatches_data = [];
 	this.swatches_media = [];
 	this.complete_swatches = [];
+	this.complete_swatch_elements = [];
 
 	this._options = {
 		container: null,
@@ -89,14 +93,39 @@ BuildSwatcher.prototype.compileData = function() {
 		});
 };
 
-BuildSwatcher.prototype.buildSwatches = function() {};
+BuildSwatcher.prototype.buildSwatches = function() {
+	if (this.swatches_data.length !== this.swatches_media.length) {
+		console.warn(
+			'Your swatches data and associated media does not appear to be matching 1:1.',
+		);
+	}
 
-/** Helper Methods **/
+	this._setupSelector();
 
-BuildSwatcher.prototype._setupSwatcher = function(options) {
-	this._options = Object.assign({}, this._options, omit(options, 'container'));
-	this._setCurrentUrl();
+	this.complete_swatches = util.mergeArraysBasedOnId(
+		this.swatches_data,
+		this.swatches_media,
+	);
+	this.complete_swatches.forEach(s => {
+		let el = swatch.buildSwatch(
+			s,
+			this._options.width,
+			swatch.handleSwatchClick,
+		);
+		this.complete_swatch_elements.push(el);
+		swatch.appendSwatchToContainer(this._options.container, el);
+	});
+
+	if (!isNil(util.getUrlQueryId())) {
+		const active = util.getSwatchFromId(
+			util.getUrlQueryId(),
+			this.complete_swatch_elements,
+		);
+		swatch.activateSwatch(active);
+	}
 };
+
+/******* Helper Methods *******/
 
 BuildSwatcher.prototype._getCurrentUrl = function() {
 	return this.current_url;
@@ -104,6 +133,28 @@ BuildSwatcher.prototype._getCurrentUrl = function() {
 
 BuildSwatcher.prototype._setCurrentUrl = function() {
 	this.current_url = util.convertUrlToAjax(util.getCurrentUrl());
+};
+
+BuildSwatcher.prototype._setupSwatcher = function(options) {
+	this._options = Object.assign({}, this._options, omit(options, 'container'));
+	this._setCurrentUrl();
+};
+
+BuildSwatcher.prototype._setupSelector = function() {
+	const selector = document.getElementById(this._options.selector_id);
+	if (!isNil(selector)) {
+		this.selector = selector;
+		this.selector.addEventListener('change', e => {
+			const name = e.target.value;
+			const id = swatch.getSwatchIdFromName(name, this.complete_swatches);
+			const active = swatch.getSwatchFromId(id, this.complete_swatch_elements);
+			swatch.activateSwatch(active);
+		});
+	} else {
+		throw new Error(
+			`A select element with the id: ${this._options.selector_id} cannot be found in the DOM.`,
+		);
+	}
 };
 
 BuildSwatcher.prototype._verifyOptions = function(required, options) {
