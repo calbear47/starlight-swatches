@@ -31,8 +31,7 @@ module.exports = {
 				.then(res => {
 					resolve({ variants: res.data.variations });
 				})
-				.catch(err => {
-					console.log(err);
+				.catch(() => {
 					reject(new Error('Failed to get product data from media image api'));
 				});
 		});

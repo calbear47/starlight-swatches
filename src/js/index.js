@@ -80,6 +80,7 @@ BuildSwatcher.prototype.compileData = function() {
 		})
 		.then(res => {
 			this.swatches_media = res.variants;
+			this.buildSwatches();
 		})
 		.catch(err => {
 			throw new Error(
@@ -87,6 +88,8 @@ BuildSwatcher.prototype.compileData = function() {
 			);
 		});
 };
+
+BuildSwatcher.prototype.buildSwatches = function() {};
 
 /** Helper Methods **/
 
