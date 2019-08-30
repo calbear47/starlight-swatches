@@ -1,12 +1,13 @@
 import axios from 'axios';
 import util from './util';
 
-module.exports = {
+const httpAPi = {
 	getProductData: url => {
 		return new Promise((resolve, reject) => {
 			axios
 				.get(url)
 				.then(res => {
+					console.log(res);
 					const data = {
 						id: res.data.id,
 						variants: util
@@ -18,8 +19,10 @@ module.exports = {
 					};
 					resolve(data);
 				})
-				.catch(() => {
-					reject(new Error('Failed to get product data from ecommerce store'));
+				.catch(err => {
+					reject(
+						new Error('Failed to get product data from ecommerce store:' + err),
+					);
 				});
 		});
 	},
@@ -31,7 +34,7 @@ module.exports = {
 				.then(res => {
 					resolve({
 						variants: res.data.variations.map(item => ({
-							id: item.product_id,
+							id: item.lightspeed_id,
 							thumbnail: item.thumbnail_url,
 							fullsize: item.fullsize_url,
 						})),
@@ -43,3 +46,5 @@ module.exports = {
 		});
 	},
 };
+
+export default httpAPi;
