@@ -4,6 +4,8 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 module.exports = {
 	entry: './src/js/index.js',
 	output: {
+		library: 'Swatches',
+		libraryTarget: 'umd',
 		path: path.resolve('dist'),
 		filename: 'bundle.js',
 	},
