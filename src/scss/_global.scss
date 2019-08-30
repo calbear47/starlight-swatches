@@ -1,5 +1,9 @@
-.fake-style-class {
-	.here-is-my-inner-class {
-		color: $white;
+.starlight-swatch-variant {
+	background-color: $c_swatch_bg;
+	cursor: pointer;
+	margin: 4px;
+
+	&.active {
+		border: solid 1px $c_swatch_active;
 	}
 }
