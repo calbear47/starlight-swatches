@@ -5,7 +5,7 @@ import omit from 'lodash.omit';
 import '../scss/app.scss'; // Ensures that our scss is built and bundled on compilation.
 import isNil from 'lodash.isnil';
 
-function BuildSwatcher(options) {
+export function BuildSwatcher(options) {
 	const required_options = ['thirdparty_api', 'selector_id'];
 
 	this.current_url = '';
@@ -109,8 +109,8 @@ BuildSwatcher.prototype.buildSwatches = function() {
 	this.complete_swatches.forEach(s => {
 		let el = swatch.buildSwatch(
 			s,
-			this._options.width,
-			swatch.handleSwatchClick,
+			this._options.swatch_width,
+			swatch.handleSwatchClick.bind(null, this.current_url),
 		);
 		this.complete_swatch_elements.push(el);
 		swatch.appendSwatchToContainer(this._options.container, el);
@@ -121,7 +121,20 @@ BuildSwatcher.prototype.buildSwatches = function() {
 			util.getUrlQueryId(),
 			this.complete_swatch_elements,
 		);
-		swatch.activateSwatch(active);
+		swatch.activateSwatch(this._options.selector_id, active, () => {
+			this._options.container
+				.querySelectorAll('.starlight-swatch-variant')
+				.forEach(el => {
+					el.classList.remove('active');
+				});
+			if (!isNil(active)) {
+				active.classList.add('active');
+			} else {
+				console.warn(
+					'BuildSwatcher: Trying to activate a product that cannot be found.',
+				);
+			}
+		});
 	}
 };
 
@@ -132,7 +145,11 @@ BuildSwatcher.prototype._getCurrentUrl = function() {
 };
 
 BuildSwatcher.prototype._setCurrentUrl = function() {
-	this.current_url = util.convertUrlToAjax(util.getCurrentUrl());
+	if (!isNil(this._options.test_url)) {
+		this.current_url = this._options.test_url;
+	} else {
+		this.current_url = util.convertUrlToAjax(util.getCurrentUrl());
+	}
 };
 
 BuildSwatcher.prototype._setupSwatcher = function(options) {
@@ -145,10 +162,9 @@ BuildSwatcher.prototype._setupSelector = function() {
 	if (!isNil(selector)) {
 		this.selector = selector;
 		this.selector.addEventListener('change', e => {
-			const name = e.target.value;
+			const name = decodeURIComponent(e.target.value);
 			const id = swatch.getSwatchIdFromName(name, this.complete_swatches);
-			const active = swatch.getSwatchFromId(id, this.complete_swatch_elements);
-			swatch.activateSwatch(active);
+			swatch.navigateToProduct(this.current_url, id);
 		});
 	} else {
 		throw new Error(
@@ -170,5 +186,3 @@ BuildSwatcher.prototype._verifyOptions = function(required, options) {
 	}
 	return true;
 };
-
-module.exports = BuildSwatcher;
