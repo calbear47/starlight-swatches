@@ -7,8 +7,14 @@ let utilApi = {
 	convertUrlToAjax: url => {
 		return url.replace('.html', '.ajax');
 	},
+	convertUrlToHtml: url => {
+		return url.replace('.ajax', '.html');
+	},
 	convertObjectToArray: obj => {
-		return Object.keys(obj).reduce((acc, curr) => [...acc, obj[curr]], []);
+		if (!isNil(obj)) {
+			return Object.keys(obj).reduce((acc, curr) => [...acc, obj[curr]], []);
+		}
+		return [];
 	},
 	cleanProductName: name => {
 		if (typeof name === 'string') {
@@ -73,6 +79,16 @@ let utilApi = {
 		});
 		return Array.from(hash.values());
 	},
+	replaceQueryString: (url, id) => {
+		if (typeof url === 'string') {
+			return `${url.split('?')[0]}?id=${id}`;
+		} else {
+			console.warn(
+				"You're trying to build a product URL to nowhere. The current_url is not set.",
+			);
+			return '';
+		}
+	},
 };
 
-module.exports = utilApi;
+export default utilApi;

@@ -20,6 +20,33 @@ describe('util', () => {
 		});
 	});
 
+	/** convertUrlToHtml **/
+	describe('convertUrlToHtml', () => {
+		test('returns a url which replaces .ajax strings to .html strings', () => {
+			const testurl =
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.ajax';
+			expect(util.convertUrlToHtml(testurl)).toBe(
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.html',
+			);
+		});
+
+		test('does replace anything when the url already contains html', () => {
+			const testurl =
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.html';
+			expect(util.convertUrlToHtml(testurl)).toBe(
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.html',
+			);
+		});
+
+		test('returns a url which replaces .ajax strings to .html strings even when there is a query parameter', () => {
+			const testurl =
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.ajax?q=asldfjalsdfja&anotherpropertyhere=398789723khsd0239';
+			expect(util.convertUrlToHtml(testurl)).toBe(
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.html?q=asldfjalsdfja&anotherpropertyhere=398789723khsd0239',
+			);
+		});
+	});
+
 	/** clearProductName **/
 	describe('cleanProductName', () => {
 		test('return correctly formatted string name with spaces around name', () => {
@@ -226,6 +253,24 @@ describe('util', () => {
 			];
 
 			expect(util.mergeArraysBasedOnId(testArr1, testArr2)).toEqual(resultArr);
+		});
+	});
+
+	describe('replaceQueryString', () => {
+		test('add the correct query id to url when there is not any query paramters to start with', () => {
+			const testUrl =
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.html';
+			expect(util.replaceQueryString(testUrl, '12345')).toBe(
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.html?id=12345',
+			);
+		});
+
+		test('add the correct query id to url when there is not any query paramters to start with', () => {
+			const testUrl =
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.html?id=9876&quantity=2';
+			expect(util.replaceQueryString(testUrl, '12345')).toBe(
+				'http://starlight-knitting-society-627463.shoplightspeed.com/cormo-worsted-elemental-affects.html?id=12345',
+			);
 		});
 	});
 });

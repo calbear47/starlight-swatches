@@ -1,11 +1,22 @@
 import isNil from 'lodash.isnil';
+import util from './util';
 
-module.exports = {
+const swatchAPI = {
+	activateSwatch: (selector_id, el, cb) => {
+		if (!isNil(el)) {
+			let color = el.dataset.color;
+			let id = el.dataset.id;
+			let selector = document.getElementById(selector_id);
+			selector.value = color;
+			cb(color, id);
+		} else {
+			console.warn('Trying to activate a product that was not found.');
+		}
+	},
 	appendSwatchToContainer: (container, swatchElement) => {
 		container.appendChild(swatchElement);
 	},
 	buildSwatch: (swatch, w, handler) => {
-		// Create swatch wrapper
 		let swatchWrapper = document.createElement('div');
 		swatchWrapper.classList.add('starlight-swatch-variant');
 		swatchWrapper.dataset.id = swatch.id;
@@ -38,9 +49,16 @@ module.exports = {
 			return found;
 		}
 	},
-	handleSwatchClick: e => {
-		console.log(e.target.dataset.id);
-		console.log(e.target.dataset.color);
-		console.log('Handle event');
+	handleSwatchClick: (url, e) => {
+		const id = e.target.dataset.id;
+		swatchAPI.navigateToProduct(url, id);
+	},
+	navigateToProduct: (url, id) => {
+		window.location.href = util.replaceQueryString(
+			util.convertUrlToHtml(url),
+			id,
+		);
 	},
 };
+
+export default swatchAPI;
